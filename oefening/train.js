@@ -1,14 +1,32 @@
-import { createChart, updateChart } from "./scatterplot.js"
+import { createChart, updateChart } from "./scatterplot.js";
 
 //
 // demo data
 //
-const data = [
-        { horsepower: 130, mpg: 18 },
-        { horsepower: 165, mpg: 15 },
-        { horsepower: 225, mpg: 14 },
-        { horsepower: 97, mpg: 18 },
-        { horsepower: 88, mpg: 27 },
-        { horsepower: 193, mpg: 9 },
-        { horsepower: 80, mpg: 25 },
-]
+const data = [];
+
+function loadData() {
+  Papa.parse("./data/cars.csv", {
+    download: true,
+    header: true,
+    dynamicTyping: true,
+    complete: (results) => checkData(results.data),
+  });
+}
+
+function checkData(parsedData) {
+  console.log(parsedData);
+  console.table(parsedData);
+  data.push(...parsedData); // Add parsed data to the data array
+  const chartdata = data.map((car) => ({
+    x: car.horsepower,
+    y: car.mpg,
+  }));
+  // kijk hoe de data eruit ziet
+  console.log(chartdata);
+
+  // chartjs aanmaken
+  createChart(chartdata, "Horsepower", "MPG");
+}
+
+loadData();
