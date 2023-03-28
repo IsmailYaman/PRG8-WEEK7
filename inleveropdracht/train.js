@@ -47,21 +47,27 @@ function startTraining() {
 
 async function finishedTraining() {
   console.log("Finished training!");
+  let predictions = [];
+  for (let hp = 40; hp < 250; hp += 2) {
+    const pred = await nn.predict({ horsepower: hp });
+    predictions.push({ x: hp, y: pred[0].mpg });
+  }
+  updateChart("Predictions", predictions);
 }
 
 async function makePrediction() {
-    const input = document.getElementById("field");
-    const horsepower = parseFloat(input.value);
-  
-    if (isNaN(horsepower)) {
-      document.getElementById("result").innerText = "Voer een geldig getal in!";
-      return;
-    }
-  
-    const results = await nn.predict({ horsepower });
-    const mpg = results[0].mpg.toFixed(2);
-    document.getElementById("result").innerText = `Geschat verbruik: ${mpg} mpg.`;
+  const input = document.getElementById("field");
+  const horsepower = parseFloat(input.value);
+
+  if (isNaN(horsepower)) {
+    document.getElementById("result").innerText = "Voer een geldig getal in!";
+    return;
   }
+
+  const results = await nn.predict({ horsepower });
+  const mpg = results[0].mpg.toFixed(2);
+  document.getElementById("result").innerText = `Geschat verbruik: ${mpg} mpg.`;
+}
 
 // Add event listener to button
 const button = document.getElementById("btn");
