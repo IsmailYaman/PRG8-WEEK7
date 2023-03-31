@@ -5,22 +5,40 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
     <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
 
-    <script defer src="./train.js" type="module"></script>
+    <script defer src="./predict.js" type="module"></script>
     <title>ML5 Neural Network Regression</title>
 </head>
 
 <body>
-    <div><h2>ML5 Neural Network Regression Training</h2></div>
-    <input type="number" id="field" placeholder="memory" />
+    <div><h2>ML5 Neural Network Regression Predict</h2></div>
+    <label>Werkgeheugen</label>
+    <input type="number" id="fieldMemory"/>
+    <label>Prijs</label>
+    <input type="number" id="fieldPrice"/>
+    <label>Batterijcapaciteit</label>
+    <input type="number" id="fieldBattery"/>
     <button id="predictionButton">Voorspel!</button>
     <div id="result">Ik voorspel...</div>
-    <button id="downloadButton">Download model</button>
-    <div><h2>Grafiek</h2></div>
-    <canvas id="myChart" width="300" height="200"></canvas>
+
 </body>
 
 </html>
+
+<!--
+
+train.html
+train.js
+predict.html
+predict.js
+model
+    model_meta.json
+    model.json
+    model.weights.bin
+data
+    cars.csv 
+
+-->
