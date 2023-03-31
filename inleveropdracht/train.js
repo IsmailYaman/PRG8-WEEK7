@@ -50,7 +50,7 @@ function chartData(data) {
 }
 
 function startTraining() {
-    nn.train({ epochs: 10 }, () => finishedTraining()) 
+    nn.train({ epochs: 20 }, () => finishedTraining()) 
 }
 
 async function finishedTraining(){
