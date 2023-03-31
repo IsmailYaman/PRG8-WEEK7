@@ -1,76 +1,81 @@
-import { createChart, updateChart } from "./scatterplot.js";
+import { createChart, updateChart } from "./libraries/scatterplot.js"
 
-//
-// demo data
-//
+const nn = ml5.neuralNetwork({ task: 'regression', debug: true })
 
-const nn = ml5.neuralNetwork({ task: "regression", debug: true });
+let min = 0
+let max = 0
+
+let field = document.getElementById('field')
 
 function loadData() {
-  Papa.parse("./data/cars.csv", {
-    download: true,
-    header: true,
-    dynamicTyping: true,
-    complete: (results) => checkData(results.data),
-  });
+    Papa.parse("./data/mobilephones.csv", {
+        download:true,
+        header:true, 
+        dynamicTyping:true,
+        complete: results => chartData(results.data)
+    })
 }
 
-function checkData(data) {
-  console.log(data);
-  console.table(data);
-  data.push(...data); // Add parsed data to the data array
-  const chartdata = data.map((car) => ({
-    x: car.horsepower,
-    y: car.mpg,
-  }));
-  // kijk hoe de data eruit ziet
-  console.log(chartdata);
+function chartData(data) {
+    const chartdata = data.map(phone => ({
+        x: phone.storage,
+        y: phone.memory,
+    }))
 
-  // chartjs aanmaken
-  createChart(chartdata, "Horsepower", "MPG");
-  // shuffle
-  data.sort(() => Math.random() - 0.5);
+    // chartjs aanmaken
+    createChart(chartdata, "storage", "memory")
 
-  // een voor een de data toevoegen aan het neural network
-  for (let car of data) {
-    nn.addData({ horsepower: car.horsepower }, { mpg: car.mpg });
-  }
+    // shuffle
+    data.sort(() => (Math.random() - 0.5))
 
-  // normalize
-  nn.normalizeData();
-  startTraining();
+    // een voor een de data toevoegen aan het neural network
+    for (let phone of data) {
+        nn.addData({ memory: phone.memory }, { storage: phone.storage })
+        if (phone.memory < min && min !== 0) {
+            min = phone.memory
+        }
+        if (phone.memory > max) {
+            max = phone.memory
+        }
+
+    }
+
+    field.min = min
+    field.max = max
+
+    // normalize
+    nn.normalizeData()
+
+    startTraining()
 }
 
 function startTraining() {
-  nn.train({ epochs: 10 }, () => finishedTraining());
+    nn.train({ epochs: 10 }, () => finishedTraining()) 
 }
 
-async function finishedTraining() {
-  console.log("Finished training!");
-  let predictions = [];
-  for (let hp = 40; hp < 250; hp += 2) {
-    const pred = await nn.predict({ horsepower: hp });
-    predictions.push({ x: hp, y: pred[0].mpg });
-  }
-  updateChart("Predictions", predictions);
+async function finishedTraining(){
+    console.log("Finished training!")
+
+    let predictions = []
+    for (let mem = min; mem < max; mem += 2) {
+        const pred = await nn.predict({memory: mem})
+        predictions.push({x: pred[0].storage, y: mem})
+    }
+    updateChart("Predictions", predictions)
 }
 
 async function makePrediction() {
-  const input = document.getElementById("field");
-  const horsepower = parseFloat(input.value);
-
-  if (isNaN(horsepower)) {
-    document.getElementById("result").innerText = "Voer een geldig getal in!";
-    return;
-  }
-
-  const results = await nn.predict({ horsepower });
-  const mpg = results[0].mpg.toFixed(2);
-  document.getElementById("result").innerText = `Geschat verbruik: ${mpg} mpg.`;
+    let value = parseInt(field.value)
+    const results = await nn.predict({ memory: value })
+    console.log(`Geschatte opslag: ${results[0].storage}`)
+    document.getElementById('result').innerHTML = `Geschatte opslag: ${results[0].storage}`
 }
 
-// Add event listener to button
-const button = document.getElementById("btn");
-button.addEventListener("click", makePrediction);
+document.getElementById('predictionButton').addEventListener('click', makePrediction)
 
-loadData();
+document.getElementById('downloadButton').addEventListener('click', () => {
+    nn.save()
+})
+
+loadData()
+
