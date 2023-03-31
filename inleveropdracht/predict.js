@@ -21,11 +21,7 @@ function modelLoaded () {
         complete: results => processData(results.data)
     })
 }
-
-// { memory: phone.memory, price: phone.price, battery: phone.battery }
-
 function processData(data) {
-    // een voor een de data toevoegen aan het neural network
     for (let phone of data) {
         if (phone.memory < minMemory && phone.memory !== 0) {
             minMemory = phone.memory
@@ -60,13 +56,12 @@ function processData(data) {
 }
 
 async function makePrediction() {
-    let valueMemory = parseInt(fieldMemory.value)
     let valuePrice = parseInt(fieldPrice.value)
+    let valueMemory = parseInt(fieldMemory.value)
     let valueBattery = parseInt(fieldBattery.value)
 
     const results = await nn.predict({ memory: valueMemory, price: valuePrice, battery: valueBattery })
 
-    // console.log(`Geschatte opslag: ${results[0].storage}`)
     document.getElementById('result').innerHTML = `Geschatte opslag: ${results[0].storage}`
 }
 
